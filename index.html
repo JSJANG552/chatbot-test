@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모바일 챗봇</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .button-container {
+            padding: 40px 20px;
+        }
+        
+        .main-button {
+            width: 100%;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .button-1 {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+        
+        .button-2 {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+        
+        .button-3 {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            color: #333;
+        }
+        
+        .main-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .main-button:active {
+            transform: translateY(0);
+        }
+        
+        .chat-interface {
+            display: none;
+            height: 500px;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .back-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .user-message {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .chat-form {
+            display: flex;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .chat-input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 25px 15px;
+            }
+            
+            .button-container {
+                padding: 30px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 초기 화면 -->
+        <div id="main-screen">
+            <div class="header">
+                <h1>고객센터</h1>
+                <p>무엇을 도와드릴까요?</p>
+            </div>
+            <div class="button-container">
+                <button class="main-button button-1" onclick="handleButton1()">
+                    🔍 장애조치이력 찾기
+                </button>
+                <button class="main-button button-2" onclick="handleButton2()">
+                    ❓ 궁금한점
+                </button>
+                <button class="main-button button-3" onclick="handleButton3()">
+                    👤 상담원연결
+                </button>
+            </div>
+        </div>
+        
+        <!-- 채팅 화면 -->
+        <div id="chat-screen" class="chat-interface">
+            <div class="chat-header">
+                <button class="back-button" onclick="goBack()">←</button>
+                <h2>상담원 연결</h2>
+                <div></div>
+            </div>
+            <div id="chat-messages" class="chat-messages">
+                <div class="message bot-message">
+                    안녕하세요! 상담원과 연결되었습니다. 무엇을 도와드릴까요?
+                </div>
+            </div>
+            <div class="loading" id="loading">
+                상담원이 입력 중입니다...
+            </div>
+            <form id="chat-form" class="chat-form">
+                <input type="text" id="chat-input" class="chat-input" placeholder="메시지를 입력하세요..." autocomplete="off">
+                <button type="submit" class="send-button">→</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 설정 파일 로드 -->
+    <script src="config.js"></script>
+    <script>
+        // API 설정 변수
+        let DIFY_API_URL = '';
+        let DIFY_API_KEY = '';
+
+        // 설정 로드 함수
+        async function loadConfig() {
+            try {
+                // config.js에서 설정 로드
+                await window.loadEnvironmentVariables();
+                
+                DIFY_API_URL = window.CONFIG.DIFY_API_URL;
+                DIFY_API_KEY = window.CONFIG.DIFY_API_KEY;
+                
+                if (!DIFY_API_URL || !DIFY_API_KEY) {
+                    throw new Error('API 설정을 찾을 수 없습니다. config.js 파일을 확인해주세요.');
+                }
+                
+                console.log('API 설정 로드 완료:', {
+                    url: DIFY_API_URL,
+                    key: DIFY_API_KEY.substring(0, 10) + '...' // 키의 일부만 로그에 표시
+                });
+            } catch (error) {
+                console.error('설정 로드 실패:', error);
+                alert('API 설정을 로드할 수 없습니다. config.js 파일을 확인해주세요.');
+            }
+        }
+
+        // 페이지 로드 시 설정 로드
+        document.addEventListener('DOMContentLoaded', loadConfig);
+
+        // 버튼 1: 장애조치이력 찾기
+        function handleButton1() {
+            showChatInterface();
+            const message = "장애조치이력 찾기";
+            addMessage(message, 'user-message');
+            sendToAPI(message);
+        }
+
+        // 버튼 2: 궁금한점
+        function handleButton2() {
+            showChatInterface();
+            const message = "궁금한점";
+            addMessage(message, 'user-message');
+            sendToAPI(message);
+        }
+
+        // 버튼 3: 상담원연결
+        function handleButton3() {
+            showChatInterface();
+            // 상담원 연결 메시지는 자동으로 추가하지 않음
+        }
+
+        // 채팅 인터페이스 표시
+        function showChatInterface() {
+            document.getElementById('main-screen').style.display = 'none';
+            document.getElementById('chat-screen').style.display = 'flex';
+        }
+
+        // 메인 화면으로 돌아가기
+        function goBack() {
+            document.getElementById('main-screen').style.display = 'block';
+            document.getElementById('chat-screen').style.display = 'none';
+        }
+
+        // 채팅 폼 이벤트 리스너
+        document.getElementById('chat-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const chatInput = document.getElementById('chat-input');
+            const userInput = chatInput.value.trim();
+            
+            if (!userInput) return;
+
+            addMessage(userInput, 'user-message');
+            chatInput.value = '';
+            
+            await sendToAPI(userInput);
+        });
+
+        // API로 메시지 전송
+        async function sendToAPI(message) {
+            const loading = document.getElementById('loading');
+            loading.classList.add('show');
+            
+            try {
+                // 환경변수 로드 확인
+                if (!DIFY_API_URL || !DIFY_API_KEY) {
+                    throw new Error('API 설정이 로드되지 않았습니다. 페이지를 새로고침해주세요.');
+                }
+                
+                console.log('API 호출 시작:', message);
+                
+                const response = await fetch(DIFY_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${DIFY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        inputs: {},
+                        query: message,
+                        response_mode: 'streaming',
+                        user: 'mobile-user'
+                    })
+                });
+
+                console.log('API 응답 상태:', response.status, response.statusText);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API 오류 응답:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                }
+                
+                // 스트리밍 응답 처리
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let botMessageElement = addMessage('', 'bot-message');
+                let buffer = '';
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    
+                    buffer = lines.pop() || '';
+                    
+                    for (const line of lines) {
+                        if (line.trim() === '') continue;
+                        
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const jsonStr = line.substring(6);
+                                if (jsonStr === '[DONE]') continue;
+                                
+                                const data = JSON.parse(jsonStr);
+                                if (data.answer) {
+                                    botMessageElement.textContent += data.answer;
+                                    document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+                                }
+                            } catch (parseError) {
+                                console.warn('JSON 파싱 오류:', parseError, 'Line:', line);
+                            }
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('상세 오류 정보:', error);
+                let errorMessage = '죄송합니다. 오류가 발생했습니다.';
+                
+                if (error.message.includes('HTTP error')) {
+                    errorMessage = `API 오류: ${error.message}`;
+                } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMessage = '네트워크 연결을 확인해주세요.';
+                } else {
+                    errorMessage = `오류: ${error.message}`;
+                }
+                
+                addMessage(errorMessage, 'bot-message');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        // 메시지 추가
+        function addMessage(text, className) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', className);
+            messageElement.textContent = text;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return messageElement;
+        }
+    </script>
+</body>
+</html>
